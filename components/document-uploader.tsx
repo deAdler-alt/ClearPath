@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface DocumentUploaderProps {
-  onUploadComplete: (fileName: string) => void;
+  onUploadComplete: (file: File) => void;
 }
 
 export function DocumentUploader({ onUploadComplete }: DocumentUploaderProps) {
@@ -36,7 +36,7 @@ export function DocumentUploader({ onUploadComplete }: DocumentUploaderProps) {
         clearInterval(interval);
         setUploadProgress(100);
         setIsUploading(false);
-        onUploadComplete(file.name);
+        onUploadComplete(file);
       }, 2000);
     },
     [onUploadComplete]
@@ -96,7 +96,7 @@ export function DocumentUploader({ onUploadComplete }: DocumentUploaderProps) {
         <input
           ref={inputRef}
           type="file"
-          accept=".pdf,.jpg,.jpeg,.png,.webp"
+          accept=".pdf,.txt,application/pdf,text/plain"
           className="hidden"
           onChange={handleInputChange}
         />
@@ -128,10 +128,10 @@ export function DocumentUploader({ onUploadComplete }: DocumentUploaderProps) {
               <Upload className="h-10 w-10 text-primary" />
             </div>
             <p className="mb-2 text-center text-xl font-medium">
-              Drag your document here (PDF, JPG) or tap to browse
+              Drag your document here (PDF, TXT) or tap to browse
             </p>
             <p className="mb-6 text-center text-sm text-muted-foreground">
-              Supported formats: PDF, JPG, PNG, WebP
+              Supported formats: PDF, TXT (text-based documents)
             </p>
             <Button variant="outline" size="lg" type="button" className="min-h-12">
               Browse Files

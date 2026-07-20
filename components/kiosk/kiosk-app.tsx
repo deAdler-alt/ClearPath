@@ -11,15 +11,33 @@ import { DocumentUploader } from "@/components/document-uploader";
 import { AnalysisResult } from "@/components/analysis-result";
 import { AnalysisSkeleton } from "@/components/analysis-skeleton";
 import { analysisSchema } from "@/lib/analysis-schema";
-import { SAMPLE_MEDICAL_TEXT } from "@/lib/sample-text";
 
-type AppState = "idle" | "uploading" | "analyzing" | "done";
+type AppState = "idle" | "extracting" | "analyzing" | "done";
+
+async function extractDocumentText(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("/api/extract", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error ?? "Failed to extract text from document");
+  }
+
+  return data.text as string;
+}
 
 export function KioskApp() {
   const [currentPanel, setCurrentPanel] = useState<AppPanel>("home");
   const [appState, setAppState] = useState<AppState>("idle");
   const [lastFileName, setLastFileName] = useState<string>("document.pdf");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const { object, submit, isLoading, error, clear } = useObject({
     api: "/api/analyze",
@@ -30,7 +48,7 @@ export function KioskApp() {
 
   const unlockedPanels = useMemo(() => {
     const panels = new Set<AppPanel>(["home", "upload", "help", "history"]);
-    if (appState === "analyzing" || appState === "done") {
+    if (appState === "extracting" || appState === "analyzing" || appState === "done") {
       panels.add("analysis");
     }
     if (appState === "done" && object) {
@@ -40,11 +58,23 @@ export function KioskApp() {
   }, [appState, object]);
 
   const handleUploadComplete = useCallback(
-    (fileName: string) => {
-      setLastFileName(fileName);
-      setAppState("analyzing");
+    async (file: File) => {
+      setLocalError(null);
+      setLastFileName(file.name);
+      setAppState("extracting");
       setCurrentPanel("analysis");
-      submit({ text: SAMPLE_MEDICAL_TEXT });
+
+      try {
+        const text = await extractDocumentText(file);
+        setAppState("analyzing");
+        submit({ text });
+      } catch (err) {
+        setAppState("idle");
+        setCurrentPanel("upload");
+        setLocalError(
+          err instanceof Error ? err.message : "Failed to process document"
+        );
+      }
     },
     [submit]
   );
@@ -77,6 +107,7 @@ export function KioskApp() {
 
   const handleStartOver = () => {
     clear();
+    setLocalError(null);
     setAppState("idle");
     setCurrentPanel("home");
     setLastFileName("document.pdf");
@@ -84,13 +115,25 @@ export function KioskApp() {
 
   const handleAnalyzeAnother = () => {
     clear();
+    setLocalError(null);
     setAppState("idle");
     setCurrentPanel("upload");
   };
 
-  const showSkeleton = currentPanel === "analysis" && isLoading && !object;
+  const showSkeleton =
+    currentPanel === "analysis" &&
+    (appState === "extracting" || appState === "analyzing") &&
+    (isLoading || !object);
   const showResults =
     currentPanel === "results" && object && (appState === "done" || !!object.summary);
+
+  const displayError =
+    localError ??
+    (error
+      ? error.message.includes("GROQ_API_KEY")
+        ? "GROQ_API_KEY is missing. Add it to .env.local and restart the server."
+        : `Analysis error: ${error.message}`
+      : null);
 
   return (
     <AppShell
@@ -110,13 +153,24 @@ export function KioskApp() {
       )}
 
       {currentPanel === "upload" && (
-        <DocumentUploader onUploadComplete={handleUploadComplete} />
+        <>
+          <DocumentUploader onUploadComplete={handleUploadComplete} />
+          {displayError && (
+            <div className="mt-4 border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+              {displayError}
+            </div>
+          )}
+        </>
       )}
 
-      {currentPanel === "analysis" && showSkeleton && <AnalysisSkeleton />}
-
-      {currentPanel === "analysis" && !showSkeleton && appState === "analyzing" && (
-        <AnalysisSkeleton />
+      {currentPanel === "analysis" && showSkeleton && (
+        <AnalysisSkeleton
+          status={
+            appState === "extracting"
+              ? "Extracting text from your document..."
+              : "Analyzing your document..."
+          }
+        />
       )}
 
       {showResults && <AnalysisResult data={object} />}
@@ -140,11 +194,9 @@ export function KioskApp() {
 
       {currentPanel === "help" && <HelpPanel onNavigate={handleNavigate} />}
 
-      {error && (
+      {displayError && currentPanel !== "upload" && (
         <div className="mt-4 border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-          {error.message.includes("GROQ_API_KEY")
-            ? "GROQ_API_KEY is missing. Add it to .env.local and restart the server."
-            : `Analysis error: ${error.message}`}
+          {displayError}
         </div>
       )}
     </AppShell>

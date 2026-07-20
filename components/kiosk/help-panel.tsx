@@ -16,7 +16,7 @@ interface HelpPanelProps {
 const faqs = [
   {
     q: "What documents can I upload?",
-    a: "ClearPath supports PDF, JPG, PNG, and WebP files. Upload medical letters, lab results, insurance documents, or legal notices.",
+    a: "ClearPath supports PDF and plain-text (.txt) files. Upload medical letters, lab results, insurance documents, or legal notices. Scanned image PDFs may not work — use text-based PDFs.",
   },
   {
     q: "How does the analysis work?",

@@ -2,13 +2,17 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function AnalysisSkeleton() {
+interface AnalysisSkeletonProps {
+  status?: string;
+}
+
+export function AnalysisSkeleton({
+  status = "Analyzing your document...",
+}: AnalysisSkeletonProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="mb-6 border-b border-border pb-4">
-        <h2 className="text-2xl font-semibold tracking-tight">
-          Analyzing your document...
-        </h2>
+        <h2 className="text-2xl font-semibold tracking-tight">{status}</h2>
         <p className="mt-1 font-mono text-sm text-muted-foreground">
           Processing — please wait
         </p>
