@@ -3,19 +3,19 @@ import { z } from "zod";
 export const analysisSchema = z.object({
   summary: z
     .string()
-    .describe("Dwa zdania podsumowania w prostym języku (ELI5)"),
+    .describe("Two sentences summarizing the document in plain English (ELI5)"),
   action_items: z
     .array(z.string())
     .length(3)
-    .describe("Trzy proste kroki do wykonania"),
+    .describe("Three simple action steps to take"),
   difficult_words: z
     .array(
       z.object({
-        word: z.string().describe("Trudne słowo z dokumentu"),
-        definition: z.string().describe("Prosta definicja tego słowa"),
+        word: z.string().describe("Difficult word from the document"),
+        definition: z.string().describe("Simple definition of the word"),
       })
     )
-    .describe("Trudne słowa z prostymi definicjami"),
+    .describe("Difficult words with simple definitions"),
 });
 
 export type AnalysisResult = z.infer<typeof analysisSchema>;

@@ -1,55 +1,53 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function AnalysisSkeleton() {
   return (
-    <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
-      <Card className="md:col-span-2">
-        <CardHeader className="flex flex-row items-center gap-3">
-          <Skeleton className="h-10 w-10 rounded-lg" />
+    <div className="flex h-full flex-col">
+      <div className="mb-6 border-b border-border pb-4">
+        <h2 className="text-2xl font-semibold tracking-tight">
+          Analyzing your document...
+        </h2>
+        <p className="mt-1 font-mono text-sm text-muted-foreground">
+          Processing — please wait
+        </p>
+      </div>
+
+      <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="border border-border bg-card p-4 md:col-span-2">
+          <Skeleton className="mb-3 h-5 w-24" />
           <div className="space-y-2">
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-4 w-48" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+            <Skeleton className="h-4 w-4/6" />
           </div>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
-          <Skeleton className="h-4 w-4/6" />
-        </CardContent>
-      </Card>
+        </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center gap-3">
-          <Skeleton className="h-10 w-10 rounded-lg" />
-          <Skeleton className="h-5 w-40" />
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center gap-3">
-              <Skeleton className="h-5 w-5 rounded" />
-              <Skeleton className="h-4 flex-1" />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+        <div className="border border-border bg-card p-4">
+          <Skeleton className="mb-3 h-5 w-40" />
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton className="h-5 w-5" />
+                <Skeleton className="h-4 flex-1" />
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center gap-3">
-          <Skeleton className="h-10 w-10 rounded-lg" />
-          <Skeleton className="h-5 w-32" />
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="space-y-1">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-3 w-full" />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+        <div className="border border-border bg-card p-4">
+          <Skeleton className="mb-3 h-5 w-32" />
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="space-y-1">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

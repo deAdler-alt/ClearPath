@@ -8,12 +8,12 @@ export async function POST(req: Request) {
   const { text } = await req.json();
 
   if (!text || typeof text !== "string") {
-    return Response.json({ error: "Brak tekstu do analizy" }, { status: 400 });
+    return Response.json({ error: "No text provided for analysis" }, { status: 400 });
   }
 
   if (!process.env.GROQ_API_KEY) {
     return Response.json(
-      { error: "Brak klucza GROQ_API_KEY w zmiennych środowiskowych" },
+      { error: "GROQ_API_KEY is not configured in environment variables" },
       { status: 500 }
     );
   }
@@ -21,13 +21,13 @@ export async function POST(req: Request) {
   const result = streamObject({
     model: groq(GROQ_MODEL),
     schema: analysisSchema,
-    system: `Jesteś ekspertem od upraszczania skomplikowanych tekstów medycznych i prawniczych.
-Twoim zadaniem jest przetłumaczenie poniższego tekstu na język zrozumiały dla 10-latka (ELI5).
-Odpowiadaj ZAWSZE po polsku.
-Zwróć wynik w formacie JSON z trzema polami:
-- "summary": dokładnie 2 zdania podsumowania w prostym języku
-- "action_items": tablica dokładnie 3 prostych kroków do wykonania (np. "Kup lek X", "Umów wizytę u lekarza")
-- "difficult_words": tablica obiektów z polami "word" (trudne słowo) i "definition" (prosta definicja)`,
+    system: `You are an expert at simplifying complex medical and legal texts.
+Your task is to explain the following text in plain English that a 10-year-old could understand (ELI5).
+Always respond in English.
+Return the result as JSON with three fields:
+- "summary": exactly 2 sentences summarizing the document in plain language
+- "action_items": an array of exactly 3 simple action steps (e.g. "Buy medicine X", "Schedule a doctor appointment")
+- "difficult_words": an array of objects with "word" (difficult term) and "definition" (simple explanation)`,
     prompt: text,
   });
 

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -14,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ClearPath — Zrozum swoje zdrowie i prawa w sekundy",
+  title: "ClearPath — Understand your health and rights in seconds",
   description:
-    "Wgraj skomplikowany dokument medyczny lub prawny. ClearPath przetłumaczy żargon na prosty język i powie Ci, co musisz zrobić.",
+    "Upload a complex medical or legal document. ClearPath translates jargon into plain English and tells you what to do next.",
 };
 
 export default function RootLayout({
@@ -26,10 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="pl"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      lang="en"
+      className={`${plusJakarta.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col overflow-hidden">
         {children}
         <Toaster />
       </body>
